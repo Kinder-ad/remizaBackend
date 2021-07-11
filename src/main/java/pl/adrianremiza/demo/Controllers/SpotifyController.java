@@ -15,6 +15,8 @@ import pl.adrianremiza.demo.Services.TrackService;
 
 import javax.annotation.PostConstruct;
 import java.security.Principal;
+import java.time.Instant;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -103,18 +105,38 @@ public class SpotifyController {
         }
         return trackJson;
     }
-    @GetMapping("/song/add/{songURI}")
-    public void addSongToQueue(@PathVariable String songURI){
-        System.out.println(songURI);
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("Authorization", "Bearer " + jwt);
-        HttpEntity httpEntity = new HttpEntity(httpHeaders);
-        ResponseEntity exchangePost =
-                restTemplate.exchange("https://api.spotify.com/v1/me/player/queue?uri="+songURI+"&device_id=8bf9ebb09ae56bea6ac31393315d97ef49581af5",
-                        HttpMethod.POST,
-                        httpEntity,
-                        void.class);
+    @PostMapping("/song/add")
+    public void addSongToQueue(@RequestBody TrackJson trackJson){
+            if(trackService.getLastSong() == null) {
+                this.trackService.setLastSong(trackJson);
+                this.trackService.deleteTrack(trackJson.getName());
+                RestTemplate restTemplate = new RestTemplate();
+                HttpHeaders httpHeaders = new HttpHeaders();
+                httpHeaders.add("Authorization", "Bearer " + jwt);
+                HttpEntity httpEntity = new HttpEntity(httpHeaders);
+                ResponseEntity exchangePost =
+                        restTemplate.exchange("https://api.spotify.com/v1/me/player/queue?uri=" + trackJson.getUri() + "&device_id=8bf9ebb09ae56bea6ac31393315d97ef49581af5",
+                                HttpMethod.POST,
+                                httpEntity,
+                                void.class);
+            }else if (LocalTime.now().toSecondOfDay()-5 >= this.trackService.getLastSong().getLocalTime().toSecondOfDay()) {
+                this.trackService.setLastSong(trackJson);
+                this.trackService.deleteTrack(trackJson.getName());
+                RestTemplate restTemplate = new RestTemplate();
+                HttpHeaders httpHeaders = new HttpHeaders();
+                httpHeaders.add("Authorization", "Bearer " + jwt);
+                HttpEntity httpEntity = new HttpEntity(httpHeaders);
+                ResponseEntity exchangePost =
+                        restTemplate.exchange("https://api.spotify.com/v1/me/player/queue?uri=" + trackJson.getUri() + "&device_id=8bf9ebb09ae56bea6ac31393315d97ef49581af5",
+                                HttpMethod.POST,
+                                httpEntity,
+                                void.class);
+            }else{
+                System.out.println("BŁĄD");
+            }
+        System.out.println(this.trackService.getLastSong().getTrackJson().getName());
+        System.out.println(LocalTime.now().toSecondOfDay()-60);
+        System.out.println(this.trackService.getLastSong().getLocalTime().toSecondOfDay());
     }
 
     @GetMapping("/song/current")
@@ -158,17 +180,24 @@ public class SpotifyController {
     }
 
     @GetMapping("/song/queue/skipvote")
-    public Object addToCounterToSkipVote(){
+    public Object addToCounterToSkipVote() throws InterruptedException {
         if(this.trackService.getCounterSkipVote()<9){
             this.trackService.addCounterSkipVote();
             return getVotes();
         }else{
+            this.addSongToQueue(this.trackService.getTracksQueue().get(0));
+            this.trackService.deleteTrack(this.trackService.getTracksQueue().get(0).getName());
+            Thread.sleep(2);
             this.skipCurrent();
             this.trackService.setCounterSkipVote();
             return getVotes();
         }
-
     }
+    @GetMapping("/song/queue/clearVote")
+    public void clearSkip(){
+        this.trackService.setCounterSkipVote();
+    }
+
     @GetMapping("/song/queue/getvote")
     public int getVotes(){
         return this.trackService.getCounterSkipVote();
