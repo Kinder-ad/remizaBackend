@@ -15,7 +15,7 @@
     <name>Remiza</name>
     <description>Demo project for Spring Boot</description>
     <properties>
-        <java.version>11</java.version>
+        <java.version>8</java.version>
     </properties>
 
     <dependencies>
@@ -54,7 +54,7 @@
                     <version>3.0.3</version>
                 </plugin>
         </plugins>
-
+        <finalName>docker-spring-boot</finalName>
     </build>
 
     <repositories>

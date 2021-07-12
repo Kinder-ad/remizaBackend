@@ -12,18 +12,17 @@ import pl.adrianremiza.demo.API.model.*;
 import pl.adrianremiza.demo.API.modelCurrent.Example;
 import pl.adrianremiza.demo.API.modelCurrent.TrackJsonCurrent;
 import pl.adrianremiza.demo.Services.TrackService;
+import pl.adrianremiza.demo.Services.TracksJsons;
 
-import javax.annotation.PostConstruct;
+import java.io.Serializable;
 import java.security.Principal;
-import java.time.Instant;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @RestController
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://remiza-front-app.herokuapp.com")
 
 public class SpotifyController {
     private String jwt;
@@ -39,8 +38,6 @@ public class SpotifyController {
 
     @GetMapping("/album/{authorName}")
     public Tracks getAlbumsByAuthor(@PathVariable String authorName) {
-
-
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Authorization", "Bearer " + jwt);
@@ -84,27 +81,30 @@ public class SpotifyController {
     }
 
     @GetMapping("/getSongs")
-    public List<TrackJson> getSongsFromPlaylist(){
+    public List<TrackJson> getSongsFromPlaylist() {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Authorization", "Bearer " + jwt);
         HttpEntity httpEntity = new HttpEntity(httpHeaders);
 
-        ResponseEntity<Tracks> exchangePost =
-                restTemplate.exchange("https://api.spotify.com/v1/playlists/37i9dQZF1DX3HUaZJRcDLd/tracks?market=eS&fields=items(track(name%2Curi%2Calbum(images(url))))",
-                        HttpMethod.GET,
-                        httpEntity,
-                        Tracks.class);
         List<TrackJson> trackJson = new ArrayList<>();
-        for (Item item : exchangePost.getBody().getItems()) {
-            trackJson.add(new TrackJson(
-                    item.getTrack().getName(),
-                    item.getTrack().getUri(),
-                    item.getTrack().getDurationMs(),
-                    item.getTrack().getAlbum().getImages().get(0).getUrl()));
+        for (int i = 0; i < 600; i=i+100) {
+            ResponseEntity<Tracks> exchangePost =
+                    restTemplate.exchange("https://api.spotify.com/v1/playlists/4cb63SLdvSFWAmjz1uzHdd/tracks?market=eS&fields=items(track(name%2Curi%2Calbum(images(url))))&limit=100&offset=" + i ,
+                            HttpMethod.GET,
+                            httpEntity,
+                            Tracks.class);
+            for (Item item : exchangePost.getBody().getItems()) {
+                trackJson.add(new TrackJson(
+                        item.getTrack().getName(),
+                        item.getTrack().getUri(),
+                        item.getTrack().getDurationMs(),
+                        item.getTrack().getAlbum().getImages().get(0).getUrl()));
+            }
         }
-        return trackJson;
+            return trackJson;
     }
+
     @PostMapping("/song/add")
     public void addSongToQueue(@RequestBody TrackJson trackJson){
             if(trackService.getLastSong() == null) {
@@ -119,7 +119,7 @@ public class SpotifyController {
                                 HttpMethod.POST,
                                 httpEntity,
                                 void.class);
-            }else if (LocalTime.now().toSecondOfDay()-5 >= this.trackService.getLastSong().getLocalTime().toSecondOfDay()) {
+            }else if (LocalTime.now().toSecondOfDay()-10 >= this.trackService.getLastSong().getLocalTime().toSecondOfDay()) {
                 this.trackService.setLastSong(trackJson);
                 this.trackService.deleteTrack(trackJson.getName());
                 RestTemplate restTemplate = new RestTemplate();
@@ -140,26 +140,29 @@ public class SpotifyController {
     }
 
     @GetMapping("/song/current")
-    public TrackJsonCurrent getSurrentSong(){
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("Authorization", "Bearer " + jwt);
-        HttpEntity<Track> httpEntity = new HttpEntity(httpHeaders);
+    public Serializable getSurrentSong(){
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.add("Authorization", "Bearer " + jwt);
+            HttpEntity<Track> httpEntity = new HttpEntity(httpHeaders);
 
-        ResponseEntity<Example> exchangePost =
-                restTemplate.exchange("https://api.spotify.com/v1/me/player/currently-playing?market=ES",
-                        HttpMethod.GET,
-                        httpEntity,
-                        Example.class);
-
-        TrackJsonCurrent trackJson = new TrackJsonCurrent(
-                exchangePost.getBody().getItem().getName(),
-                exchangePost.getBody().getItem().getUri(),
-                exchangePost.getBody().getItem().getDurationMs(),
-                exchangePost.getBody().getProgressMs(),
-                exchangePost.getBody().getItem().getAlbum().getImages().get(0).getUrl()
-        );
-        return trackJson;
+            ResponseEntity<Example> exchangePost =
+                    restTemplate.exchange("https://api.spotify.com/v1/me/player/currently-playing?market=ES",
+                            HttpMethod.GET,
+                            httpEntity,
+                            Example.class);
+            TrackJsonCurrent trackJson = new TrackJsonCurrent(
+                    exchangePost.getBody().getItem().getName(),
+                    exchangePost.getBody().getItem().getUri(),
+                    exchangePost.getBody().getItem().getDurationMs(),
+                    exchangePost.getBody().getProgressMs(),
+                    exchangePost.getBody().getItem().getAlbum().getImages().get(0).getUrl()
+            );
+            return trackJson;
+        }catch (Exception exception){
+            return exception;
+        }
     }
 
     @PostMapping("/song")
@@ -169,7 +172,7 @@ public class SpotifyController {
 
 
     @GetMapping("/getQueue")
-    public List<TrackJson> getQueue(){
+    public List<TracksJsons> getQueue(){
         return this.trackService.getTracksQueue();
     }
     @Transactional
@@ -185,8 +188,8 @@ public class SpotifyController {
             this.trackService.addCounterSkipVote();
             return getVotes();
         }else{
-            this.addSongToQueue(this.trackService.getTracksQueue().get(0));
-            this.trackService.deleteTrack(this.trackService.getTracksQueue().get(0).getName());
+            this.addSongToQueue(this.trackService.getTracksQueue().get(0).getTrackJson());
+            this.trackService.deleteTrack(this.trackService.getTracksQueue().get(0).getTrackJson().getName());
             Thread.sleep(2);
             this.skipCurrent();
             this.trackService.setCounterSkipVote();
@@ -202,5 +205,10 @@ public class SpotifyController {
     public int getVotes(){
         return this.trackService.getCounterSkipVote();
     }
+    @GetMapping("/song/queue/{name}")
+    public void addVoteToSong(@PathVariable String name){
+        this.trackService.addVoteToSong(name);
+    }
+
 
 }
