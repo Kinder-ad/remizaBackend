@@ -10,9 +10,9 @@ public class WebSecurityCORS implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
-                .allowedOrigins("http://localhost:4200")
+                .allowedOrigins("https://remiza-front-app.herokuapp.com")
                 .allowedMethods("*")
-                .maxAge(3600L)
+                .maxAge(36000L)
                 .allowedHeaders("*")
                 .exposedHeaders("Authorization")
                 .allowCredentials(true);
