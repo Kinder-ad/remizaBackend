@@ -67,14 +67,18 @@ public class SpotifyController {
 
     @GetMapping("/skip")
     public void skipCurrent(){
-
+        if(this.trackService.getTracksQueue().size()==0){
+            System.out.println("Nie ma");
+        }else{
+            System.out.println("Jest");
+        }
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Authorization", "Bearer " + jwt);
         HttpEntity httpEntity = new HttpEntity(httpHeaders);
 
         ResponseEntity exchangePost =
-                restTemplate.exchange("https://api.spotify.com/v1/me/player/next?device_id=8bf9ebb09ae56bea6ac31393315d97ef49581af5",
+                restTemplate.exchange("https://api.spotify.com/v1/me/player/next?device_id=fb1c077efb4cdba435f1426ba0af0ec4c0c94387",
                         HttpMethod.POST,
                         httpEntity,
                         void.class);
@@ -115,7 +119,7 @@ public class SpotifyController {
                 httpHeaders.add("Authorization", "Bearer " + jwt);
                 HttpEntity httpEntity = new HttpEntity(httpHeaders);
                 ResponseEntity exchangePost =
-                        restTemplate.exchange("https://api.spotify.com/v1/me/player/queue?uri=" + trackJson.getUri() + "&device_id=8bf9ebb09ae56bea6ac31393315d97ef49581af5",
+                        restTemplate.exchange("https://api.spotify.com/v1/me/player/queue?uri=" + trackJson.getUri() + "&device_id=fb1c077efb4cdba435f1426ba0af0ec4c0c94387",
                                 HttpMethod.POST,
                                 httpEntity,
                                 void.class);
@@ -127,7 +131,7 @@ public class SpotifyController {
                 httpHeaders.add("Authorization", "Bearer " + jwt);
                 HttpEntity httpEntity = new HttpEntity(httpHeaders);
                 ResponseEntity exchangePost =
-                        restTemplate.exchange("https://api.spotify.com/v1/me/player/queue?uri=" + trackJson.getUri() + "&device_id=8bf9ebb09ae56bea6ac31393315d97ef49581af5",
+                        restTemplate.exchange("https://api.spotify.com/v1/me/player/queue?uri=" + trackJson.getUri() + "&device_id=fb1c077efb4cdba435f1426ba0af0ec4c0c94387",
                                 HttpMethod.POST,
                                 httpEntity,
                                 void.class);
@@ -184,16 +188,22 @@ public class SpotifyController {
 
     @GetMapping("/song/queue/skipvote")
     public Object addToCounterToSkipVote() throws InterruptedException {
-        if(this.trackService.getCounterSkipVote()<9){
+        if(this.trackService.getCounterSkipVote()<2){
+            System.out.println(this.trackService.getCounterSkipVote());
             this.trackService.addCounterSkipVote();
             return getVotes();
-        }else{
-            this.addSongToQueue(this.trackService.getTracksQueue().get(0).getTrackJson());
-            this.trackService.deleteTrack(this.trackService.getTracksQueue().get(0).getTrackJson().getName());
-            Thread.sleep(2);
-            this.skipCurrent();
-            this.trackService.setCounterSkipVote();
-            return getVotes();
+        }else {
+            if(this.trackService.getTracksQueue().size()==0){
+                this.skipCurrent();
+                return getVotes();
+            }else {
+                this.addSongToQueue(this.trackService.getTracksQueue().get(0).getTrackJson());
+                this.trackService.deleteTrack(this.trackService.getTracksQueue().get(0).getTrackJson().getName());
+                Thread.sleep(2);
+                this.skipCurrent();
+                this.trackService.setCounterSkipVote();
+                return getVotes();
+            }
         }
     }
     @GetMapping("/song/queue/clearVote")
