@@ -22,7 +22,7 @@ import java.util.*;
 @Controller
 @RestController
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://remiza-front-app.herokuapp.com")
 
 public class SpotifyController {
     private String jwt;
@@ -188,7 +188,7 @@ public class SpotifyController {
 
     @GetMapping("/song/queue/skipvote")
     public Object addToCounterToSkipVote() throws InterruptedException {
-        if(this.trackService.getCounterSkipVote()<9){
+        if(this.trackService.getCounterSkipVote()<2){
             System.out.println(this.trackService.getCounterSkipVote());
             this.trackService.addCounterSkipVote();
             return getVotes();
