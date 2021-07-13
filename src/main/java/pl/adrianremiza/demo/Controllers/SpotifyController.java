@@ -94,7 +94,7 @@ public class SpotifyController {
         List<TrackJson> trackJson = new ArrayList<>();
         for (int i = 0; i < 600; i=i+100) {
             ResponseEntity<Tracks> exchangePost =
-                    restTemplate.exchange("https://api.spotify.com/v1/playlists/4cb63SLdvSFWAmjz1uzHdd/tracks?market=eS&fields=items(track(name%2Curi%2Calbum(images(url))))&limit=100&offset=" + i ,
+                    restTemplate.exchange("https://api.spotify.com/v1/playlists/37i9dQZF1DX0XUsuxWHRQd/tracks?market=eS&fields=items(track(name%2Curi%2Calbum(images(url))))&limit=100&offset=" + i ,
                             HttpMethod.GET,
                             httpEntity,
                             Tracks.class);
