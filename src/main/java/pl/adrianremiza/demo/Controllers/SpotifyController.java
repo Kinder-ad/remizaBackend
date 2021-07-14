@@ -1,5 +1,6 @@
 package pl.adrianremiza.demo.Controllers;
 
+import com.wrapper.spotify.SpotifyApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -195,6 +196,7 @@ public class SpotifyController {
         }else {
             if(this.trackService.getTracksQueue().size()==0){
                 this.skipCurrent();
+                this.trackService.setCounterSkipVote();
                 return getVotes();
             }else {
                 this.addSongToQueue(this.trackService.getTracksQueue().get(0).getTrackJson());
