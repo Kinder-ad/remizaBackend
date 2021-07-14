@@ -1,5 +1,6 @@
 package pl.adrianremiza.demo.Controllers;
 
+import com.wrapper.spotify.SpotifyApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -94,7 +95,7 @@ public class SpotifyController {
         List<TrackJson> trackJson = new ArrayList<>();
         for (int i = 0; i < 600; i=i+100) {
             ResponseEntity<Tracks> exchangePost =
-                    restTemplate.exchange("https://api.spotify.com/v1/playlists/37i9dQZF1DX0XUsuxWHRQd/tracks?market=eS&fields=items(track(name%2Curi%2Calbum(images(url))))&limit=100&offset=" + i ,
+                    restTemplate.exchange("https://api.spotify.com/v1/playlists/4cb63SLdvSFWAmjz1uzHdd/tracks?market=eS&fields=items(track(name%2Curi%2Calbum(images(url))))&limit=100&offset=" + i ,
                             HttpMethod.GET,
                             httpEntity,
                             Tracks.class);
@@ -188,13 +189,14 @@ public class SpotifyController {
 
     @GetMapping("/song/queue/skipvote")
     public Object addToCounterToSkipVote() throws InterruptedException {
-        if(this.trackService.getCounterSkipVote()<=2){
+        if(this.trackService.getCounterSkipVote()<2){
             System.out.println(this.trackService.getCounterSkipVote());
             this.trackService.addCounterSkipVote();
             return getVotes();
         }else {
             if(this.trackService.getTracksQueue().size()==0){
                 this.skipCurrent();
+                this.trackService.setCounterSkipVote();
                 return getVotes();
             }else {
                 this.addSongToQueue(this.trackService.getTracksQueue().get(0).getTrackJson());

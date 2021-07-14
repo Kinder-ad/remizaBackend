@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import pl.adrianremiza.demo.Controllers.SpotifyController;
 
 import javax.annotation.PostConstruct;
 
@@ -17,7 +16,5 @@ public class RemizaApplication {
         SpringApplication.run(RemizaApplication.class, args);
     }
 
-    @Autowired
-    SpotifyController spotifyController;
 
 }
