@@ -46,4 +46,14 @@ public class TrackJson implements Serializable {
     public void setUri(String uri) {
         this.uri = uri;
     }
+
+    @Override
+    public String toString() {
+        return "TrackJson{" +
+                "name='" + name + '\'' +
+                ", uri='" + uri + '\'' +
+                ", durationMs=" + durationMs +
+                ", url='" + url + '\'' +
+                '}';
+    }
 }
