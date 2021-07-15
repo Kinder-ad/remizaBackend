@@ -57,4 +57,15 @@ public class TrackJsonCurrent implements Serializable {
     public void setUri(String uri) {
         this.uri = uri;
     }
+
+    @Override
+    public String toString() {
+        return "TrackJsonCurrent{" +
+                "name='" + name + '\'' +
+                ", uri='" + uri + '\'' +
+                ", durationMs=" + durationMs +
+                ", progressMs=" + progressMs +
+                ", url='" + url + '\'' +
+                '}';
+    }
 }
