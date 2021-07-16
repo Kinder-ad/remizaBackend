@@ -122,6 +122,7 @@ public class SpotifyController {
                                 HttpMethod.POST,
                                 httpEntity,
                                 void.class);
+                this.trackService.setCounterSkipVote();
             }else if (LocalTime.now().toSecondOfDay()-8 >= this.trackService.getLastSong().getLocalTime().toSecondOfDay()) {
                 this.trackService.setLastSong(trackJson);
                 this.trackService.deleteTrack(trackJson.getName());
@@ -137,6 +138,7 @@ public class SpotifyController {
                 this.trackService.setCounterSkipVote();
             }else{
                 System.out.println("BŁĄD");
+                this.trackService.setCounterSkipVote();
             }
     }
 
