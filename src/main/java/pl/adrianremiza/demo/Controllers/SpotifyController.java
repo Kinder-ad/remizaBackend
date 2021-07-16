@@ -24,8 +24,8 @@ import java.util.*;
 @Controller
 @RestController
 
-//@CrossOrigin(origins = "https://remiza-front-app.herokuapp.com")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "https://remiza-front-app.herokuapp.com")
+// @CrossOrigin(origins = "http://localhost:4200")
 
 public class SpotifyController {
     private String jwt;
