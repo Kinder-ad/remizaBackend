@@ -24,8 +24,8 @@ import java.util.*;
 @Controller
 @RestController
 
-@CrossOrigin(origins = "https://remiza-front-app.herokuapp.com")
-//@CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin(origins = "https://remiza-front-app.herokuapp.com")
+@CrossOrigin(origins = "http://localhost:4200")
 
 public class SpotifyController {
     private String jwt;
@@ -92,7 +92,7 @@ public class SpotifyController {
         List<TrackJson> trackJson = new ArrayList<>();
         for (int i = 0; i < 600; i=i+100) {
             ResponseEntity<Tracks> exchangePost =
-                    restTemplate.exchange("https://api.spotify.com/v1/playlists/4cb63SLdvSFWAmjz1uzHdd/tracks?market=eS&fields=items(track(name%2Curi%2Calbum(images(url))))&limit=100&offset=" + i ,
+                    restTemplate.exchange("https://api.spotify.com/v1/playlists/1Sq8XHC2XX5hKIlHmGbeAg/tracks?market=eS&fields=items(track(name%2Curi%2Calbum(images(url))))&limit=100&offset=" + i ,
                             HttpMethod.GET,
                             httpEntity,
                             Tracks.class);
@@ -121,7 +121,7 @@ public class SpotifyController {
                                 HttpMethod.POST,
                                 httpEntity,
                                 void.class);
-            }else if (LocalTime.now().toSecondOfDay()-10 >= this.trackService.getLastSong().getLocalTime().toSecondOfDay()) {
+            }else if (LocalTime.now().toSecondOfDay()-8 >= this.trackService.getLastSong().getLocalTime().toSecondOfDay()) {
                 this.trackService.setLastSong(trackJson);
                 this.trackService.deleteTrack(trackJson.getName());
                 RestTemplate restTemplate = new RestTemplate();
@@ -197,8 +197,10 @@ public class SpotifyController {
                     this.trackService.setCounterSkipVote();
                 }else{
                     System.out.println(trackService.getCounterSkipVote()+"4");
-                    this.addSongToQueue(this.trackService.getTracksQueue().get(0).getTrackJson());
-                    Thread.sleep(1);
+                    for(int i = 0 ; i < 3 ; i++) {
+                        this.addSongToQueue(this.trackService.getTracksQueue().get(0).getTrackJson());
+                        Thread.sleep(700);
+                    }
                     this.skipCurrent();
                     this.trackService.setCounterSkipVote();
                 }
