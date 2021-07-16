@@ -186,7 +186,7 @@ public class SpotifyController {
         this.trackService.deleteTrack(name);
     }
 
-    @GetMapping("/song/queue/skipvote")
+     @GetMapping("/song/queue/skipvote")
     public Object addToCounterToSkipVote() throws InterruptedException {
         System.out.println("counterVote: "+trackService.getCounterSkipVote());
             if(trackService.getCounterSkipVote()>2){
@@ -197,43 +197,21 @@ public class SpotifyController {
                     this.trackService.setCounterSkipVote();
                 }else{
                     System.out.println(trackService.getCounterSkipVote()+"4");
-                    for(int i = 0 ; i < 3 ; i++) {
+                    for(int i = 0 ; i < 5 ; i++) {
                         this.addSongToQueue(this.trackService.getTracksQueue().get(0).getTrackJson());
-                        Thread.sleep(700);
                     }
-                    for(int j = 0 ; j < 3 ; j++) {
+                    
                         this.skipCurrent();
-                    }
+                    
                     this.trackService.setCounterSkipVote();
                 }
             }else{
                 System.out.println(trackService.getCounterSkipVote()+"5");
                 this.trackService.addCounterSkipVote();
             }
-//        if(this.trackService.getCounterSkipVote()
-        ){
-//            if(this.trackService.getCounterSkipVote()<2) {
-//                this.trackService.addCounterSkipVote();
-//                return getVotes();
-//            }else {
-//                return getVotes();
-//            }
-//        }else {
-//            if(this.trackService.getTracksQueue().size()==0){
-//                this.skipCurrent();
-//                this.trackService.setCounterSkipVote();
-//                return getVotes();
-//            }else {
-//                this.addSongToQueue(this.trackService.getTracksQueue().get(0).getTrackJson());
-//                this.trackService.deleteTrack(this.trackService.getTracksQueue().get(0).getTrackJson().getName());
-//                Thread.sleep(2);
-//                this.skipCurrent();
-//                this.trackService.setCounterSkipVote();
-//                return getVotes();
-//            }
-//        }
         return getVotes();
     }
+  
     @GetMapping("/song/queue/clearVote")
     public void clearSkip(){
         this.trackService.setCounterSkipVote();
