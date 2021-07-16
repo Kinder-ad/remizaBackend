@@ -109,7 +109,7 @@ public class SpotifyController {
     }
 
     @PostMapping("/song/add")
-    public void addSongToQueue(@RequestBody TrackJson trackJson){
+    public void addSongToQueue(@RequestBody TrackJson trackJson) throws InterruptedException {
             if(trackService.getLastSong() == null) {
                 this.trackService.setLastSong(trackJson);
                 this.trackService.deleteTrack(trackJson.getName());
@@ -122,6 +122,8 @@ public class SpotifyController {
                                 HttpMethod.POST,
                                 httpEntity,
                                 void.class);
+                Thread.sleep(1);
+                this.skipCurrent();
                 this.trackService.setCounterSkipVote();
             }else if (LocalTime.now().toSecondOfDay()-8 >= this.trackService.getLastSong().getLocalTime().toSecondOfDay()) {
                 this.trackService.setLastSong(trackJson);
@@ -135,6 +137,8 @@ public class SpotifyController {
                                 HttpMethod.POST,
                                 httpEntity,
                                 void.class);
+                Thread.sleep(1);
+                this.skipCurrent();
                 this.trackService.setCounterSkipVote();
             }else{
                 System.out.println("BŁĄD");
@@ -201,9 +205,8 @@ public class SpotifyController {
                     for(int i = 0 ; i < 5 ; i++) {
                         this.addSongToQueue(this.trackService.getTracksQueue().get(0).getTrackJson());
                     }
-                    for(int i = 0 ; i < 3 ; i++) {
-                        this.skipCurrent();
-                    }
+
+
                     this.trackService.setCounterSkipVote();
                 }
             }else{
