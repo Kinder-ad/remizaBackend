@@ -190,7 +190,7 @@ public class SpotifyController {
     @GetMapping("/song/queue/skipvote")
     public Object addToCounterToSkipVote() throws InterruptedException {
         System.out.println("counterVote: "+trackService.getCounterSkipVote());
-            if(trackService.getCounterSkipVote()>2){
+            if(trackService.getCounterSkipVote()>2){fsdgsdsdggsdgs
                 System.out.println(trackService.getCounterSkipVote()+"2");
                 if(this.trackService.getTracksQueue().size()==0){
                     System.out.println(trackService.getCounterSkipVote()+"3");
