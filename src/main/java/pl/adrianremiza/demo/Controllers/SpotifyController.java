@@ -201,14 +201,17 @@ public class SpotifyController {
                         this.addSongToQueue(this.trackService.getTracksQueue().get(0).getTrackJson());
                         Thread.sleep(700);
                     }
+                    for(int i = 0 ; i < 2 ; i++) {
                     this.skipCurrent();
+                    }
                     this.trackService.setCounterSkipVote();
                 }
             }else{
                 System.out.println(trackService.getCounterSkipVote()+"5");
                 this.trackService.addCounterSkipVote();
             }
-//        if(this.trackService.getCounterSkipVote()<2){
+//        if(this.trackService.getCounterSkipVote()
+        ){
 //            if(this.trackService.getCounterSkipVote()<2) {
 //                this.trackService.addCounterSkipVote();
 //                return getVotes();
