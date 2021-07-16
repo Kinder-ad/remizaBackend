@@ -70,6 +70,7 @@ public class SpotifyController {
 
     @GetMapping("/skip")
     public void skipCurrent(){
+        this.trackService.setCounterSkipVote();
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Authorization", "Bearer " + jwt);
@@ -133,12 +134,10 @@ public class SpotifyController {
                                 HttpMethod.POST,
                                 httpEntity,
                                 void.class);
+                this.trackService.setCounterSkipVote();
             }else{
                 System.out.println("BŁĄD");
             }
-        System.out.println(this.trackService.getLastSong().getTrackJson().getName());
-        System.out.println(LocalTime.now().toSecondOfDay()-60);
-        System.out.println(this.trackService.getLastSong().getLocalTime().toSecondOfDay());
     }
 
     @GetMapping("/song/current")
