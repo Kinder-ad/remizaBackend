@@ -201,7 +201,9 @@ public class SpotifyController {
                     for(int i = 0 ; i < 5 ; i++) {
                         this.addSongToQueue(this.trackService.getTracksQueue().get(0).getTrackJson());
                     }
-                    this.skipCurrent();
+                    for(int i = 0 ; i < 2 ; i++) {
+                        this.skipCurrent();
+                    }
                     this.trackService.setCounterSkipVote();
                 }
             }else{
