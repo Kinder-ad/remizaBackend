@@ -200,7 +200,6 @@ public class SpotifyController {
                     System.out.println(trackService.getCounterSkipVote()+"4");
                     for(int i = 0 ; i < 3 ; i++) {
                         this.addSongToQueue(this.trackService.getTracksQueue().get(0).getTrackJson());
-                        Thread.sleep(700);
                     }
                     this.skipCurrent();
                     this.trackService.setCounterSkipVote();
