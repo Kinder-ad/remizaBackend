@@ -77,7 +77,7 @@ public class SpotifyController {
         HttpEntity httpEntity = new HttpEntity(httpHeaders);
 
         ResponseEntity exchangePost =
-                restTemplate.exchange("https://api.spotify.com/v1/me/player/next?device_id=fb1c077efb4cdba435f1426ba0af0ec4c0c94387",
+                restTemplate.exchange("https://api.spotify.com/v1/me/player/next?device_id=c23c9cf8ac9ef712867b86ef9bcbd7f3f6bd9a33",
                         HttpMethod.POST,
                         httpEntity,
                         void.class);
@@ -118,7 +118,7 @@ public class SpotifyController {
                 httpHeaders.add("Authorization", "Bearer " + jwt);
                 HttpEntity httpEntity = new HttpEntity(httpHeaders);
                 ResponseEntity exchangePost =
-                        restTemplate.exchange("https://api.spotify.com/v1/me/player/queue?uri=" + trackJson.getUri() + "&device_id=fb1c077efb4cdba435f1426ba0af0ec4c0c94387",
+                        restTemplate.exchange("https://api.spotify.com/v1/me/player/queue?uri=" + trackJson.getUri() + "&device_id=c23c9cf8ac9ef712867b86ef9bcbd7f3f6bd9a33",
                                 HttpMethod.POST,
                                 httpEntity,
                                 void.class);
