@@ -122,7 +122,7 @@ public class SpotifyController {
                                 HttpMethod.POST,
                                 httpEntity,
                                 void.class);
-                Thread.sleep(1);
+                Thread.sleep(3);
                 this.skipCurrent();
                 this.trackService.setCounterSkipVote();
             }else if (LocalTime.now().toSecondOfDay()-8 >= this.trackService.getLastSong().getLocalTime().toSecondOfDay()) {
@@ -137,7 +137,7 @@ public class SpotifyController {
                                 HttpMethod.POST,
                                 httpEntity,
                                 void.class);
-                Thread.sleep(1);
+                Thread.sleep(3);
                 this.skipCurrent();
                 this.trackService.setCounterSkipVote();
             }else{
@@ -205,8 +205,6 @@ public class SpotifyController {
                     for(int i = 0 ; i < 5 ; i++) {
                         this.addSongToQueue(this.trackService.getTracksQueue().get(0).getTrackJson());
                     }
-
-
                     this.trackService.setCounterSkipVote();
                 }
             }else{
