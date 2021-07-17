@@ -1,8 +1,8 @@
 package pl.adrianremiza.demo.Controllers;
 
-import com.wrapper.spotify.SpotifyApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.stereotype.Controller;
@@ -12,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 import pl.adrianremiza.demo.API.model.*;
 import pl.adrianremiza.demo.API.modelCurrent.Example;
 import pl.adrianremiza.demo.API.modelCurrent.TrackJsonCurrent;
-import pl.adrianremiza.demo.Exception.ForbiddenException;
 import pl.adrianremiza.demo.Services.TrackService;
 import pl.adrianremiza.demo.Services.TracksJsons;
 
@@ -24,7 +23,7 @@ import java.util.*;
 @Controller
 @RestController
 
-@CrossOrigin(origins = "https://remiza-front-app.herokuapp.com")
+@CrossOrigin(origins = "https://remizanowawies.herokuapp.com")
 //@CrossOrigin(origins = "http://localhost:4200")
 
 public class SpotifyController {
@@ -194,7 +193,7 @@ public class SpotifyController {
     @GetMapping("/song/queue/skipvote")
     public Object addToCounterToSkipVote() throws InterruptedException {
         System.out.println("counterVote: "+trackService.getCounterSkipVote());
-            if(trackService.getCounterSkipVote()>2){
+            if(trackService.getCounterSkipVote()>13){
                 System.out.println(trackService.getCounterSkipVote()+"2");
                 if(this.trackService.getTracksQueue().size()==0){
                     System.out.println(trackService.getCounterSkipVote()+"3");
