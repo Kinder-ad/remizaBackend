@@ -23,8 +23,8 @@ import java.util.*;
 @Controller
 @RestController
 
-@CrossOrigin(origins = "https://remizanowawies.herokuapp.com")
-//@CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin(origins = "https://remizanowawies.herokuapp.com")
+@CrossOrigin(origins = "http://localhost:4200")
 
 public class SpotifyController {
     private String jwt;
@@ -32,8 +32,8 @@ public class SpotifyController {
     @Autowired
     TrackService trackService;
 
-    @GetMapping("/aut")
-    public Principal autoryzuj(Principal principal,OAuth2Authentication details){
+    @GetMapping("/authorize")
+    public Principal authorize(Principal principal,OAuth2Authentication details){
         this.jwt = ((OAuth2AuthenticationDetails)details.getDetails()).getTokenValue();
         return principal;
     }
@@ -67,7 +67,7 @@ public class SpotifyController {
         return exchange.getBody();
     }
 
-    @GetMapping("/skip")
+    @GetMapping("/song/skip")
     public void skipCurrent(){
         this.trackService.setCounterSkipVote();
         RestTemplate restTemplate = new RestTemplate();
@@ -76,13 +76,13 @@ public class SpotifyController {
         HttpEntity httpEntity = new HttpEntity(httpHeaders);
 
         ResponseEntity exchangePost =
-                restTemplate.exchange("https://api.spotify.com/v1/me/player/next?device_id=ad2e8633d7fa02ca44809e20c682cea8f9651890",
+                restTemplate.exchange("https://api.spotify.com/v1/me/player/next?device_id=8bf9ebb09ae56bea6ac31393315d97ef49581af5",
                         HttpMethod.POST,
                         httpEntity,
                         void.class);
     }
 
-    @GetMapping("/getSongs")
+    @GetMapping("/song/getSongs")
     public List<TrackJson> getSongsFromPlaylist() {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -107,7 +107,7 @@ public class SpotifyController {
             return trackJson;
     }
 
-    @PostMapping("/song/add")
+    @PostMapping("/song")
     public void addSongToQueue(@RequestBody TrackJson trackJson) throws InterruptedException {
             if(trackService.getLastSong() == null) {
                 this.trackService.setLastSong(trackJson);
@@ -117,11 +117,11 @@ public class SpotifyController {
                 httpHeaders.add("Authorization", "Bearer " + jwt);
                 HttpEntity httpEntity = new HttpEntity(httpHeaders);
                 ResponseEntity exchangePost =
-                        restTemplate.exchange("https://api.spotify.com/v1/me/player/queue?uri=" + trackJson.getUri() + "&device_id=ad2e8633d7fa02ca44809e20c682cea8f9651890",
+                        restTemplate.exchange("https://api.spotify.com/v1/me/player/queue?uri=" + trackJson.getUri() + "&device_id=8bf9ebb09ae56bea6ac31393315d97ef49581af5",
                                 HttpMethod.POST,
                                 httpEntity,
                                 void.class);
-                Thread.sleep(3);
+                Thread.sleep(2000);
                 this.skipCurrent();
                 this.trackService.setCounterSkipVote();
             }else if (LocalTime.now().toSecondOfDay()-8 >= this.trackService.getLastSong().getLocalTime().toSecondOfDay()) {
@@ -132,11 +132,11 @@ public class SpotifyController {
                 httpHeaders.add("Authorization", "Bearer " + jwt);
                 HttpEntity httpEntity = new HttpEntity(httpHeaders);
                 ResponseEntity exchangePost =
-                        restTemplate.exchange("https://api.spotify.com/v1/me/player/queue?uri=" + trackJson.getUri() + "&device_id=ad2e8633d7fa02ca44809e20c682cea8f9651890",
+                        restTemplate.exchange("https://api.spotify.com/v1/me/player/queue?uri=" + trackJson.getUri() + "&device_id=8bf9ebb09ae56bea6ac31393315d97ef49581af5",
                                 HttpMethod.POST,
                                 httpEntity,
                                 void.class);
-                Thread.sleep(3);
+                Thread.sleep(2000);
                 this.skipCurrent();
                 this.trackService.setCounterSkipVote();
             }else{
@@ -173,57 +173,48 @@ public class SpotifyController {
         }
     }
 
-    @PostMapping("/song")
+    @PostMapping("/queue")
     public void addSongToQueueTab(@RequestBody TrackJson trackJson){
         this.trackService.addToList(trackJson);
     }
 
 
-    @GetMapping("/getQueue")
+    @GetMapping("/queue")
     public List<TracksJsons> getQueue(){
         return this.trackService.getTracksQueue();
     }
     @Transactional
-    @DeleteMapping("/song/queue/{name}")
+    @DeleteMapping("/queue/{name}")
     public void deleteSongFromQueueTab(@PathVariable String name) {
         System.out.println(name);
         this.trackService.deleteTrack(name);
     }
 
-    @GetMapping("/song/queue/skipvote")
-    public Object addToCounterToSkipVote() throws InterruptedException {
-        System.out.println("counterVote: "+trackService.getCounterSkipVote());
-            if(trackService.getCounterSkipVote()>13){
-                System.out.println(trackService.getCounterSkipVote()+"2");
+    @PostMapping("/queue/vote")
+    public Object addToCounterToSkipVote(@RequestBody int vote) throws InterruptedException {
+            if(trackService.getCounterSkipVote()>1){
                 if(this.trackService.getTracksQueue().size()==0){
-                    System.out.println(trackService.getCounterSkipVote()+"3");
                     this.skipCurrent();
                     this.trackService.setCounterSkipVote();
                 }else{
-                    System.out.println(trackService.getCounterSkipVote()+"4");
                     for(int i = 0 ; i < 5 ; i++) {
                         this.addSongToQueue(this.trackService.getTracksQueue().get(0).getTrackJson());
                     }
                     this.trackService.setCounterSkipVote();
                 }
             }else{
-                System.out.println(trackService.getCounterSkipVote()+"5");
                 this.trackService.addCounterSkipVote();
             }
         return getVotes();
     }
-    @GetMapping("/song/queue/clearVote")
+    @GetMapping("/queue/clearVote")
     public void clearSkip(){
         this.trackService.setCounterSkipVote();
     }
 
-    @GetMapping("/song/queue/getvote")
+    @GetMapping("/queue/vote")
     public int getVotes(){
         return this.trackService.getCounterSkipVote();
-    }
-    @GetMapping("/song/queue/{name}")
-    public void addVoteToSong(@PathVariable String name){
-        this.trackService.addVoteToSong(name);
     }
 
 
