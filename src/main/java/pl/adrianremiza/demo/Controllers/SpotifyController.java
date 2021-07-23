@@ -190,9 +190,17 @@ public class SpotifyController {
         this.trackService.deleteTrack(name);
     }
 
+<<<<<<< HEAD
     @PostMapping("/queue/vote")
     public Object addToCounterToSkipVote(@RequestBody int vote) throws InterruptedException {
             if(trackService.getCounterSkipVote()>1){
+=======
+    @GetMapping("/song/queue/skipvote")
+    public Object addToCounterToSkipVote() throws InterruptedException {
+        System.out.println("counterVote: "+trackService.getCounterSkipVote());
+            if(trackService.getCounterSkipVote()>8){
+                System.out.println(trackService.getCounterSkipVote()+"2");
+>>>>>>> e14db0da1265773b27966b06d322193fb4ab1bd2
                 if(this.trackService.getTracksQueue().size()==0){
                     this.skipCurrent();
                     this.trackService.setCounterSkipVote();
